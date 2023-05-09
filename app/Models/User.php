@@ -55,7 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function loadRelationshipCounts()
     {
-        $this->loadCount(['microposts','followings', 'followers']);
+        $this->loadCount(['microposts','followings', 'followers','favorites']);
     }
     
     /**
@@ -134,5 +134,56 @@ class User extends Authenticatable implements MustVerifyEmail
         $userIds[] = $this->id;
         // それらのユーザが所有する投稿に絞り込む
         return Micropost::whereIn('user_id', $userIds);
+    }
+    
+    /**
+     * このユーザがお気に入りの投稿。（Userモデルとの関係を定義）
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(User::class, 'user_favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+    
+    /**
+     * $micropostIdで指定された投稿をお気に入り登録する。
+     *
+     */
+    public function favorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        $its_me = $this->id == $micropostId;
+        
+        if ($exist || $its_me) {
+            return false;
+        } else {
+            $this->favorites()->attach($micropostId);
+            return true;
+        }
+    }
+    
+    /**
+     * $micropostIdで指定された投稿をお気に入り解除する。
+     * 
+     */
+    public function unfavorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        $its_me = $this->id == $micropostId;
+        
+        if ($exist && !$its_me) {
+            $this->favorites()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * 指定された$micropostIdの投稿がこのユーザのお気に入りであるか調べる。お気に入りならtrueを返す。
+     * 
+     */
+    public function is_favorite($micropostId)
+    {
+        return $this->favorites()->where('micropost_id', $micropostId)->exists();
     }
 }
