@@ -125,19 +125,19 @@ class UsersController extends Controller
      */
     public function favorites($id)
     {
-        // idの値でユーザを検索して取得
-        $user = User::findOrFail($id);
+        // idの値で投稿を検索して取得
+        $micropost = \App\Models\Micropost::findOrFail($id);
 
         // 関係するモデルの件数をロード
-        $user->loadRelationshipCounts();
+        $micropost->loadRelationshipCounts();
 
         // お気に入り一覧を取得
-        $favorites = $user->favorites()->paginate(10);
+        $favorites = $micropost->favorites()->paginate(10);
 
         // お気に入り一覧ビューでそれらを表示
         return view('users.favorites', [
-            'user' => $user,
-            'favorites' => $favorites,
+            'micropost' => $micropost,
+            'microposts' => $favorites,
         ]);
     }
 }

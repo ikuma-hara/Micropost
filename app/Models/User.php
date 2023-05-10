@@ -151,7 +151,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function favorite($micropostId)
     {
         $exist = $this->is_favorite($micropostId);
-        $its_me = $this->id == $micropostId;
+        $its_me = $this->id == $userId;
         
         if ($exist || $its_me) {
             return false;
@@ -168,7 +168,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unfavorite($micropostId)
     {
         $exist = $this->is_favorite($micropostId);
-        $its_me = $this->id == $micropostId;
+        $its_me = $this->id == $userId;
         
         if ($exist && !$its_me) {
             $this->favorites()->detach($micropostId);
