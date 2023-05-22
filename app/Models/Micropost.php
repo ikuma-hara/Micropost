@@ -20,9 +20,17 @@ class Micropost extends Model
     }
     
     /**
+     * このユーザに関係するモデルの件数をロードする。
+     */
+    public function loadRelationshipCounts()
+    {
+        $this->loadCount(['microposts','favorites']);
+    }
+    
+    /**
      * このユーザがお気に入りの投稿。（Userモデルとの関係を定義）
      */
-    public function favorites()
+    public function favorite_users()
     {
         return $this->belongsToMany(User::class, 'user_favorites', 'user_id', 'micropost_id')->withTimestamps();
     }

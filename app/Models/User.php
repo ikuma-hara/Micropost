@@ -141,7 +141,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function favorites()
     {
-        return $this->belongsToMany(User::class, 'user_favorites', 'user_id', 'micropost_id')->withTimestamps();
+        return $this->belongsToMany(Micropost::class, 'user_favorites', 'user_id', 'micropost_id')->withTimestamps();
     }
     
     /**
@@ -151,9 +151,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function favorite($micropostId)
     {
         $exist = $this->is_favorite($micropostId);
-        $its_me = $this->id == $userId;
-        
-        if ($exist || $its_me) {
+
+        if ($exist) {
             return false;
         } else {
             $this->favorites()->attach($micropostId);
@@ -168,9 +167,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unfavorite($micropostId)
     {
         $exist = $this->is_favorite($micropostId);
-        $its_me = $this->id == $userId;
-        
-        if ($exist && !$its_me) {
+
+        if ($exist) {
             $this->favorites()->detach($micropostId);
             return true;
         } else {
